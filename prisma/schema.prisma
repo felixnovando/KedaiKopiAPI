@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  id String @id @default(cuid())
+  username String @unique
+  password String
+}
+
+model Customer{
+  id String @id @default(cuid())
+  name String
+  transactions Transaction[]
+}
+
+model Transaction{
+  id String @id @default(cuid())
+  date DateTime @default(now())
+  payment_method String
+  customer_id String
+  customer Customer @relation(fields: [customer_id], references: [id])
+  transaction_details TransactionDetail[]
+}
+
+model Menu{
+  id String @id @default(cuid())
+  name String
+  price Int
+  transaction_details TransactionDetail[]
+}
+
+model TransactionDetail{
+  transaction_id String
+  menu_id String
+  @@id([transaction_id, menu_id])
+  qty Int
+  menu Menu @relation(fields: [menu_id], references: [id])
+  transaction Transaction @relation(fields: [transaction_id], references: [id])
+}
+
+
